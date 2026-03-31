@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskFlow — DevOps Project</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --surface: #161920;
+      --surface2: #1e2330;
+      --border: #2a2f3d;
+      --accent: #6c8eff;
+      --accent2: #a78bfa;
+      --green: #34d399;
+      --yellow: #fbbf24;
+      --red: #f87171;
+      --text: #e8eaf0;
+      --text2: #8b92a8;
+      --text3: #5a6070;
+      --radius: 12px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Manrope', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,15,20,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+    .nav-brand {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.4rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+    .nav-links { display: flex; gap: 0.5rem; }
+    .nav-links a {
+      color: var(--text2); text-decoration: none;
+      padding: 0.4rem 0.9rem; border-radius: 8px;
+      font-size: 0.875rem; font-weight: 500;
+      transition: all 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--text); background: var(--surface2);
+    }
+
+    /* PAGE SYSTEM */
+    .page { display: none; padding: 2rem; max-width: 900px; margin: 0 auto; }
+    .page.active { display: block; animation: fadeUp 0.35s ease; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ABOUT PAGE */
+    .about-hero {
+      text-align: center; padding: 3rem 0 2rem;
+    }
+    .avatar {
+      width: 120px; height: 120px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Serif Display', serif;
+      font-size: 3rem; color: white;
+      margin: 0 auto 1.5rem;
+      box-shadow: 0 0 0 4px var(--surface2), 0 0 0 8px var(--border);
+    }
+    .about-hero h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.5rem; letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--text), var(--text2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .about-hero p { color: var(--text2); margin-top: 0.5rem; font-size: 1rem; }
+    .info-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem; margin-top: 2rem;
+    }
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .info-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .info-card .label {
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--text3); font-weight: 600; margin-bottom: 0.4rem;
+      font-family: 'DM Mono', monospace;
+    }
+    .info-card .value {
+      font-size: 1.1rem; font-weight: 700; color: var(--text);
+    }
+    .tech-section { margin-top: 2.5rem; }
+    .tech-section h3 {
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--text3); margin-bottom: 1rem;
+    }
+    .tech-pills { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .pill {
+      background: var(--surface2); border: 1px solid var(--border);
+      padding: 0.35rem 0.85rem; border-radius: 100px;
+      font-size: 0.8rem; color: var(--text2); font-weight: 500;
+      font-family: 'DM Mono', monospace;
+    }
+    .pill.accent { border-color: var(--accent); color: var(--accent); }
+
+    /* TASKS PAGE */
+    .page-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+    .page-header h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem; letter-spacing: -0.03em;
+    }
+    .stats-row {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 0.75rem; margin-bottom: 1.75rem;
+    }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1rem 1.25rem;
+      text-align: center;
+    }
+    .stat-card .num {
+      font-size: 2rem; font-weight: 700;
+      font-family: 'DM Serif Display', serif;
+    }
+    .stat-card .lbl { font-size: 0.75rem; color: var(--text3); margin-top: 0.2rem; }
+    .stat-card.total .num { color: var(--accent); }
+    .stat-card.done  .num { color: var(--green); }
+    .stat-card.pend  .num { color: var(--yellow); }
+    .stat-card.high  .num { color: var(--red); }
+
+    /* Form */
+    .form-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.5rem;
+    }
+    .form-card h3 {
+      font-size: 0.95rem; font-weight: 700; margin-bottom: 1.1rem;
+      color: var(--text2);
+    }
+    .form-row { display: grid; grid-template-columns: 1fr auto; gap: 0.75rem; align-items: end; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem; }
+    label { display: block; font-size: 0.75rem; color: var(--text3); margin-bottom: 0.35rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+    input, select, textarea {
+      width: 100%; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.65rem 0.9rem;
+      color: var(--text); font-family: 'Manrope', sans-serif; font-size: 0.9rem;
+      outline: none; transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 70px; }
+    select option { background: var(--surface2); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.65rem 1.2rem; border-radius: 8px; border: none;
+      font-family: 'Manrope', sans-serif; font-size: 0.875rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: #5a7eff; transform: translateY(-1px); }
+    .btn-ghost { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+    .btn-ghost:hover { color: var(--text); border-color: var(--text3); }
+    .btn-danger { background: transparent; color: var(--red); border: 1px solid transparent; padding: 0.4rem 0.7rem; }
+    .btn-danger:hover { background: rgba(248,113,113,0.1); border-color: var(--red); }
+    .btn-success { background: transparent; color: var(--green); border: 1px solid transparent; padding: 0.4rem 0.7rem; }
+    .btn-success:hover { background: rgba(52,211,153,0.1); border-color: var(--green); }
+    .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+
+    /* Task List */
+    .task-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .task-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1rem 1.25rem;
+      display: flex; align-items: center; gap: 1rem;
+      transition: border-color 0.2s, transform 0.15s;
+      animation: fadeUp 0.3s ease;
+    }
+    .task-item:hover { border-color: var(--border); transform: translateX(2px); }
+    .task-item.completed { opacity: 0.55; }
+    .task-check {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 2px solid var(--border); background: transparent;
+      cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .task-check.done { background: var(--green); border-color: var(--green); }
+    .task-check.done::after { content: '✓'; color: white; font-size: 0.75rem; font-weight: 700; }
+    .task-body { flex: 1; min-width: 0; }
+    .task-title {
+      font-weight: 600; font-size: 0.95rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .task-item.completed .task-title { text-decoration: line-through; color: var(--text3); }
+    .task-desc { font-size: 0.8rem; color: var(--text3); margin-top: 0.2rem; }
+    .task-meta { display: flex; gap: 0.4rem; margin-top: 0.4rem; }
+    .badge {
+      font-size: 0.65rem; font-weight: 700; padding: 0.15rem 0.55rem;
+      border-radius: 100px; text-transform: uppercase; letter-spacing: 0.07em;
+      font-family: 'DM Mono', monospace;
+    }
+    .badge-high { background: rgba(248,113,113,0.15); color: var(--red); }
+    .badge-medium { background: rgba(251,191,36,0.15); color: var(--yellow); }
+    .badge-low { background: rgba(52,211,153,0.15); color: var(--green); }
+    .task-actions { display: flex; gap: 0.25rem; }
+    .empty-state {
+      text-align: center; padding: 3rem; color: var(--text3);
+    }
+    .empty-state .icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .empty-state p { font-size: 0.9rem; }
+
+    /* HEALTH PAGE */
+    .health-container { max-width: 600px; margin: 3rem auto; text-align: center; }
+    .health-status {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 2.5rem; margin-bottom: 1.5rem;
+    }
+    .health-dot {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--green); margin: 0 auto 1.5rem;
+      box-shadow: 0 0 0 6px rgba(52,211,153,0.15);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 0 6px rgba(52,211,153,0.15); }
+      50% { box-shadow: 0 0 0 12px rgba(52,211,153,0.05); }
+    }
+    .health-dot.error { background: var(--red); box-shadow: 0 0 0 6px rgba(248,113,113,0.15); animation: none; }
+    .health-label {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+    }
+    .health-label.ok { color: var(--green); }
+    .health-label.error { color: var(--red); }
+    .health-json {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.25rem; margin-top: 1.25rem;
+      text-align: left; font-family: 'DM Mono', monospace;
+      font-size: 0.85rem; color: var(--accent2);
+      white-space: pre; overflow-x: auto;
+    }
+    .health-btn { margin-top: 1rem; }
+
+    /* Toast */
+    .toast-container {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      display: flex; flex-direction: column; gap: 0.5rem; z-index: 999;
+    }
+    .toast {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 0.75rem 1.2rem;
+      font-size: 0.875rem; min-width: 240px;
+      animation: toastIn 0.3s ease;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    .toast.success { border-left: 3px solid var(--green); }
+    .toast.error   { border-left: 3px solid var(--red); }
+
+    /* Loading */
+    .spinner {
+      border: 2px solid var(--border); border-top-color: var(--accent);
+      border-radius: 50%; width: 18px; height: 18px;
+      animation: spin 0.7s linear infinite; display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 640px) {
+      .stats-row { grid-template-columns: repeat(2,1fr); }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      nav { padding: 0 1rem; }
+      .page { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">TaskFlow</div>
+  <div class="nav-links">
+    <a href="#" class="active" onclick="showPage('tasks', this)">📋 Tasks</a>
+    <a href="#" onclick="showPage('about', this)">👤 About</a>
+    <a href="#" onclick="showPage('health', this)">💚 Health</a>
+  </div>
+</nav>
+
+<!-- ═══ TASKS PAGE ═══════════════════════════════════════════ -->
+<div id="page-tasks" class="page active">
+  <div class="page-header">
+    <h2>My Tasks</h2>
+    <button class="btn btn-ghost btn-sm" onclick="loadStats(); loadTasks()">
+      <span id="refresh-icon">↻</span> Refresh
+    </button>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card total"><div class="num" id="stat-total">—</div><div class="lbl">Total</div></div>
+    <div class="stat-card done"><div class="num" id="stat-done">—</div><div class="lbl">Done</div></div>
+    <div class="stat-card pend"><div class="num" id="stat-pend">—</div><div class="lbl">Pending</div></div>
+    <div class="stat-card high"><div class="num" id="stat-high">—</div><div class="lbl">Urgent</div></div>
+  </div>
+
+  <div class="form-card">
+    <h3>➕ Add New Task</h3>
+    <div class="form-grid">
+      <div>
+        <label>Title *</label>
+        <input type="text" id="task-title" placeholder="Task title..." />
+      </div>
+      <div>
+        <label>Priority</label>
+        <select id="task-priority">
+          <option value="medium">🟡 Medium</option>
+          <option value="high">🔴 High</option>
+          <option value="low">🟢 Low</option>
+        </select>
+      </div>
+      <div>
+        <label>Description</label>
+        <input type="text" id="task-desc" placeholder="Optional description..." />
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;">
+      <button class="btn btn-primary" onclick="createTask()">
+        <span>＋</span> Add Task
+      </button>
+    </div>
+  </div>
+
+  <div id="task-list" class="task-list">
+    <div class="empty-state"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- ═══ ABOUT PAGE ════════════════════════════════════════════ -->
+<div id="page-about" class="page">
+  <div class="about-hero">
+    <div class="avatar" id="avatar-initials">?</div>
+    <h1 id="student-name">Loading...</h1>
+    <p>DevOps Mini Project — Task Manager Application</p>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="label">Họ và Tên</div>
+      <div class="value" id="info-name">—</div>
+    </div>
+    <div class="info-card">
+      <div class="label">Mã Số Sinh Viên</div>
+      <div class="value" id="info-id" style="font-family:'DM Mono',monospace">—</div>
+    </div>
+    <div class="info-card">
+      <div class="label">Lớp</div>
+      <div class="value" id="info-class">—</div>
+    </div>
+    <div class="info-card">
+      <div class="label">Ứng Dụng</div>
+      <div class="value" id="info-app">—</div>
+    </div>
+  </div>
+
+  <div class="tech-section">
+    <h3>Tech Stack</h3>
+    <div class="tech-pills">
+      <span class="pill accent">Node.js</span>
+      <span class="pill accent">Express</span>
+      <span class="pill accent">MongoDB</span>
+      <span class="pill">React (Vanilla)</span>
+      <span class="pill">Docker</span>
+      <span class="pill">Docker Compose</span>
+      <span class="pill">Git</span>
+    </div>
+  </div>
+
+  <div class="tech-section" style="margin-top:2rem;">
+    <h3>API Endpoints</h3>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+      <table style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border);">
+            <th style="padding:0.75rem 1rem;text-align:left;color:var(--text3);font-weight:600;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;">Method</th>
+            <th style="padding:0.75rem 1rem;text-align:left;color:var(--text3);font-weight:600;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;">Endpoint</th>
+            <th style="padding:0.75rem 1rem;text-align:left;color:var(--text3);font-weight:600;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;">Description</th>
+          </tr>
+        </thead>
+        <tbody id="api-table-body">
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:0.65rem 1rem;"><span class="badge badge-low">GET</span></td>
+            <td style="padding:0.65rem 1rem;font-family:'DM Mono',monospace;color:var(--text2)">/health</td>
+            <td style="padding:0.65rem 1rem;color:var(--text3)">Health check</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:0.65rem 1rem;"><span class="badge badge-low">GET</span></td>
+            <td style="padding:0.65rem 1rem;font-family:'DM Mono',monospace;color:var(--text2)">/about</td>
+            <td style="padding:0.65rem 1rem;color:var(--text3)">Student info</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:0.65rem 1rem;"><span class="badge badge-low">GET</span></td>
+            <td style="padding:0.65rem 1rem;font-family:'DM Mono',monospace;color:var(--text2)">/api/tasks</td>
+            <td style="padding:0.65rem 1rem;color:var(--text3)">List all tasks</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:0.65rem 1rem;"><span class="badge badge-medium">POST</span></td>
+            <td style="padding:0.65rem 1rem;font-family:'DM Mono',monospace;color:var(--text2)">/api/tasks</td>
+            <td style="padding:0.65rem 1rem;color:var(--text3)">Create task</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:0.65rem 1rem;"><span class="badge badge-medium">PUT</span></td>
+            <td style="padding:0.65rem 1rem;font-family:'DM Mono',monospace;color:var(--text2)">/api/tasks/:id</td>
+            <td style="padding:0.65rem 1rem;color:var(--text3)">Update task</td>
+          </tr>
+          <tr>
+            <td style="padding:0.65rem 1rem;"><span class="badge badge-high">DELETE</span></td>
+            <td style="padding:0.65rem 1rem;font-family:'DM Mono',monospace;color:var(--text2)">/api/tasks/:id</td>
+            <td style="padding:0.65rem 1rem;color:var(--text3)">Delete task</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HEALTH PAGE ═══════════════════════════════════════════ -->
+<div id="page-health" class="page">
+  <div class="health-container">
+    <h2 style="font-family:'DM Serif Display',serif;font-size:2rem;margin-bottom:2rem;">System Health</h2>
+    <div class="health-status">
+      <div class="health-dot" id="health-dot"></div>
+      <div class="health-label ok" id="health-label">Checking...</div>
+      <div class="health-json" id="health-json">{ "status": "loading..." }</div>
+      <button class="btn btn-ghost health-btn" onclick="checkHealth()">↻ Check Again</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toasts"></div>
+
+<script>
+  const API = window.ENV_API_URL || "http://localhost:5000";
+
+  // ── Navigation ──────────────────────────────────────────
+  function showPage(name, el) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    if (el) el.classList.add('active');
+    if (name === 'tasks') { loadTasks(); loadStats(); }
+    if (name === 'about') { loadAbout(); }
+    if (name === 'health') { checkHealth(); }
+  }
+
+  // ── Toast ───────────────────────────────────────────────
+  function toast(msg, type = 'success') {
+    const c = document.getElementById('toasts');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.textContent = (type === 'success' ? '✓ ' : '✕ ') + msg;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+  }
+
+  // ── Stats ───────────────────────────────────────────────
+  async function loadStats() {
+    try {
+      const r = await fetch(`${API}/api/stats`);
+      const { data } = await r.json();
+      document.getElementById('stat-total').textContent = data.total;
+      document.getElementById('stat-done').textContent = data.completed;
+      document.getElementById('stat-pend').textContent = data.pending;
+      document.getElementById('stat-high').textContent = data.highPriority;
+    } catch {}
+  }
+
+  // ── Tasks ───────────────────────────────────────────────
+  async function loadTasks() {
+    const list = document.getElementById('task-list');
+    list.innerHTML = '<div class="empty-state"><div class="spinner"></div></div>';
+    try {
+      const r = await fetch(`${API}/api/tasks`);
+      const { data } = await r.json();
+      renderTasks(data);
+    } catch (e) {
+      list.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><p>Cannot connect to backend. Is the server running?</p></div>';
+    }
+  }
+
+  function renderTasks(tasks) {
+    const list = document.getElementById('task-list');
+    if (!tasks.length) {
+      list.innerHTML = '<div class="empty-state"><div class="icon">📝</div><p>No tasks yet. Add one above!</p></div>';
+      return;
+    }
+    list.innerHTML = tasks.map(t => `
+      <div class="task-item ${t.completed ? 'completed' : ''}" id="task-${t._id}">
+        <div class="task-check ${t.completed ? 'done' : ''}" onclick="toggleTask('${t._id}', ${!t.completed})"></div>
+        <div class="task-body">
+          <div class="task-title">${escHtml(t.title)}</div>
+          ${t.description ? `<div class="task-desc">${escHtml(t.description)}</div>` : ''}
+          <div class="task-meta">
+            <span class="badge badge-${t.priority}">${t.priority}</span>
+            <span class="badge" style="background:var(--surface2);color:var(--text3)">${formatDate(t.createdAt)}</span>
+          </div>
+        </div>
+        <div class="task-actions">
+          <button class="btn btn-success" onclick="toggleTask('${t._id}', ${!t.completed})" title="${t.completed ? 'Mark pending' : 'Mark done'}">
+            ${t.completed ? '↺' : '✓'}
+          </button>
+          <button class="btn btn-danger" onclick="deleteTask('${t._id}')" title="Delete">✕</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function createTask() {
+    const title = document.getElementById('task-title').value.trim();
+    const description = document.getElementById('task-desc').value.trim();
+    const priority = document.getElementById('task-priority').value;
+    if (!title) { toast('Title is required', 'error'); return; }
+    try {
+      const r = await fetch(`${API}/api/tasks`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description, priority })
+      });
+      if (!r.ok) throw new Error();
+      document.getElementById('task-title').value = '';
+      document.getElementById('task-desc').value = '';
+      toast('Task created!');
+      loadTasks(); loadStats();
+    } catch { toast('Failed to create task', 'error'); }
+  }
+
+  async function toggleTask(id, completed) {
+    try {
+      await fetch(`${API}/api/tasks/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ completed })
+      });
+      toast(completed ? 'Task completed! 🎉' : 'Task reopened');
+      loadTasks(); loadStats();
+    } catch { toast('Update failed', 'error'); }
+  }
+
+  async function deleteTask(id) {
+    if (!confirm('Delete this task?')) return;
+    try {
+      await fetch(`${API}/api/tasks/${id}`, { method: 'DELETE' });
+      toast('Task deleted');
+      document.getElementById('task-' + id)?.remove();
+      loadStats();
+    } catch { toast('Delete failed', 'error'); }
+  }
+
+  // ── About ───────────────────────────────────────────────
+  async function loadAbout() {
+    try {
+      const r = await fetch(`${API}/about`);
+      const data = await r.json();
+      const s = data.student;
+      const initials = s.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+      document.getElementById('avatar-initials').textContent = initials;
+      document.getElementById('student-name').textContent = s.name;
+      document.getElementById('info-name').textContent = s.name;
+      document.getElementById('info-id').textContent = s.studentId;
+      document.getElementById('info-class').textContent = s.class;
+      document.getElementById('info-app').textContent = data.app + ' v' + data.version;
+    } catch {
+      document.getElementById('student-name').textContent = 'Backend offline';
+    }
+  }
+
+  // ── Health ──────────────────────────────────────────────
+  async function checkHealth() {
+    const dot = document.getElementById('health-dot');
+    const lbl = document.getElementById('health-label');
+    const json = document.getElementById('health-json');
+    dot.className = 'health-dot'; lbl.textContent = 'Checking...';
+    try {
+      const r = await fetch(`${API}/health`);
+      const data = await r.json();
+      dot.className = 'health-dot';
+      lbl.className = 'health-label ok'; lbl.textContent = 'ONLINE';
+      json.textContent = JSON.stringify(data, null, 2);
+    } catch {
+      dot.className = 'health-dot error';
+      lbl.className = 'health-label error'; lbl.textContent = 'OFFLINE';
+      json.textContent = '{ "status": "error", "message": "Cannot reach backend" }';
+    }
+  }
+
+  // ── Helpers ─────────────────────────────────────────────
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function formatDate(d) {
+    return new Date(d).toLocaleDateString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric' });
+  }
+
+  // ── Init ─────────────────────────────────────────────────
+  loadTasks();
+  loadStats();
+</script>
+</body>
+</html>
